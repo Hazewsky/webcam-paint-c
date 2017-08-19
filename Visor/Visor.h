@@ -22,8 +22,12 @@ namespace Visoring{
 		
 	
 		void onTrackbar(int, void*);
+
 		void saveFilter(char* fileName);
 		std::vector<int> getFilterData(char* fileName);
+
+		void saveBrushInfo(char* fileName);
+		void getBrushData(char* fileName, cv::Scalar&color, int&brushSize);
 
 		cv::Mat createDrawSettings();
 		void onDrawSettings(cv::Mat&, bool isActive);

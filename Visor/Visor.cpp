@@ -17,6 +17,7 @@ namespace Visoring{
 		height = this->frame.rows;
 		width = this->frame.cols;
 		this->lowerColor = getFilterData(filterSettingsFileName);
+		getBrushData(brushSettingsFileName, this->color, this->brushSize);
 #define preSet  cv::Mat::zeros(frame.size(), CV_8UC1);
 		this->hsv = preSet;
 		this->colorRange = preSet;
@@ -209,11 +210,12 @@ namespace Visoring{
 			cv::imshow(brushSettingsFrameName, frame);
 		}
 		else {
+			saveBrushInfo(brushSettingsFileName);
 			cv::destroyWindow(brushSettingsFrameName);
 		}
 	}
 	void Visor::saveFilter(char* fileName) {
-		std::ofstream fout(filterSettingsFileName, std::fstream::trunc);
+		std::ofstream fout(fileName, std::fstream::trunc);
 		for (auto& i :lowerColor) {
 			fout << i << std::endl;
 		}
@@ -221,17 +223,49 @@ namespace Visoring{
 
 	}
 	std::vector<int> Visor::getFilterData(char* fileName) {
-		std::ifstream fin(filterSettingsFileName);
-		//check if the file is empty
-		std::vector<int> buff = std::vector<int>{};
-		if (fin.peek() == std::ifstream::traits_type::eof()) {
-			return  std::vector<int>{0,0,0};
+		try {
+			std::ifstream fin(fileName);
+			//check if the file is empty
+			std::vector<int> buff = std::vector<int>{};
+			if (fin.peek() == std::ifstream::traits_type::eof()) {
+				return  std::vector<int>{0, 0, 0};
+			}
+			int value = 0;
+			while (fin >> value) {
+				buff.push_back(value);
+			}
+			fin.close();
+			return buff;
 		}
-		int value = 0;
-		while (fin>>value) {
-			buff.push_back(value);
+		catch (cv::Exception ex) {
+
 		}
-		return buff;
+	}
+
+	void Visor::saveBrushInfo(char* fileName) {
+		std::ofstream fout(fileName, std::fstream::trunc);
+		fout << color[0] << " " << color[1] << " " << color[2] << " " << brushSize;
+		fout.close();
+	}
+
+	void Visor::getBrushData(char* filename, cv::Scalar&color, int&brushSize) {
+		try {
+			std::ifstream fin(filename);
+			//check if the file is empty
+			
+			if (fin.peek() == std::ifstream::traits_type::eof()) {
+				color = cv::Scalar(255, 255, 255);
+				brushSize = 2;
+			}
+			fin >> color[0] >> color[1] >> color[2] >> brushSize;
+			
+			//fin >> colBuf[0] >> colBuf[1] >> colBuf[2] >> brushBuf;
+			//std::cout << colBuf << " " << brushBuf;
+			fin.close();
+		}
+		catch (cv::Exception ex) {
+
+		}
 	}
 
 	void Visor::endWork(){
