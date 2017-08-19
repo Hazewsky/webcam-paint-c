@@ -6,8 +6,7 @@ Requirements:
 
 Run project (Release mode only) -> Configure the filter to capture your "draw-object" ('TAB') -> Enter draw mode using SPACE -> ENJOY! 
 
-ATTENTION!  I highly recommend you not to run the project in Debug mode. It becomes laggy like mess. 
-
+ATTENTION!  No support for Debug mode. Sorry.
 #### Tasks to do ####
 1) Finish settings screen
 2) Remake HUD - delete color change, add control buttons for FIlter, Brush and Exit
