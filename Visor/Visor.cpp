@@ -3,15 +3,14 @@
 #include <math.h>
 #include <fstream>
 #include <string>
-namespace Visoring{
+namespace Visoring {
+
 
 	Visor::Visor() :
 		lowerColor({ 0, 0,0 }),
-		upperColor({255,255,255}),
+		upperColor({ 255,255,255 }),
 		kernel(cv::Mat::ones(3, 3, CV_8UC1)),
-		anchor(0,0),
-		color(255,255,255),
-		brushSize(2)
+		anchor(0, 0)
 	{
 		this->cap.read(this->frame);
 		height = this->frame.rows;
@@ -34,22 +33,90 @@ namespace Visoring{
 		this->drawing = drawSet;
 		this->buffer = drawSet;
 		this->writing = drawSet;
+		shiftX = (int)this->width / 10;
+		shiftY = (int)this->height / 10;
 	}
 
 	void Visor::programLoop() {
 
 	}
-	void Visor::writeImage(cv::InputOutputArray &source, std::string name){
-		if (source.size() != cv::Size(0,0))
+	void Visor::writeImage(cv::InputOutputArray &source, std::string name) {
+		if (source.size() != cv::Size(0, 0))
 		{
-	//		cv::cvtColor(source, source, CV_BGR2RGB);
+			//		cv::cvtColor(source, source, CV_BGR2RGB);
 			cv::imwrite("images/" + name + ".jpg", source);
 		}
-		
+
+	}
+
+	bool Visor::progressBar(cv::Mat& src) {
+		cv::rectangle(src, cv::Point(0, 0), cv::Point(this->width, 0.5 * shiftY), cv::Scalar(0, 0, 255), -1);
+		//for (int i = 0; i < this->width; i += (this->width / 3.0) * .001){
+		//	cv::rectangle(src, cv::Point(0, 0), cv::Point(i, 0.5 * shiftY), cv::Scalar(0, 0, 255), -1);
+		//}
+
+		for (int i = 0; i < 100; i++) {
+			cv::rectangle(src, cv::Point(0, 0), cv::Point(i, 0.5 * shiftY), cv::Scalar(i, i, i), -1);
+		}
+		return true;
 	}
 	void Visor::drawHUD(cv::Mat & src){
 		
-	
+		//FILTER
+		cv::rectangle(src, cv::Point(0.5 * shiftX, shiftY),
+			cv::Point(2.5* shiftX, 2 * shiftY),
+			cv::Scalar(127, 127, 127), -1);
+		cv::rectangle(src, cv::Point(0.5 * shiftX- borderSize, shiftY-borderSize),
+			cv::Point(2.5* shiftX+ borderSize, 2 * shiftY+ borderSize),
+			cv::Scalar(255, 255, 255));
+		cv::putText(src, "Fllter", cv::Point(shiftX, 1.5 * shiftY),
+			cv::FONT_HERSHEY_COMPLEX,.5,cv::Scalar(255,255,255));
+		
+		//BRUSH
+		cv::rectangle(src, cv::Point(3.0* shiftX, shiftY),
+			cv::Point(4.5* shiftX, 2 * shiftY),
+			cv::Scalar(127, 127, 127),-1);
+		cv::rectangle(src, cv::Point(3.0* shiftX-borderSize, shiftY-borderSize),
+			cv::Point(4.5* shiftX + borderSize, 2 * shiftY+ borderSize),
+			cv::Scalar(255, 255, 255));
+		cv::putText(src, "Brush", cv::Point(3.5 * shiftX, 1.5 * shiftY), 
+			cv::FONT_HERSHEY_COMPLEX, .5, cv::Scalar(255, 255, 255));
+		
+		//SAVE
+		cv::rectangle(src, cv::Point(5.0 * shiftX, shiftY),
+			cv::Point(6.5 * shiftX, 2 * shiftY),
+			cv::Scalar(127, 127, 127), -1);
+		cv::rectangle(src, cv::Point(5.0 * shiftX-borderSize, shiftY-borderSize),
+			cv::Point(6.5 * shiftX+ borderSize, 2 * shiftY+ borderSize),
+			cv::Scalar(255, 255, 255));
+		cv::putText(src, "Save", cv::Point(5.5 * shiftX, 1.5 * shiftY),
+			cv::FONT_HERSHEY_COMPLEX, .5, cv::Scalar(255, 255, 255));
+
+		//EXIT
+		cv::rectangle(src, cv::Point(7.0 * shiftX, shiftY),
+			cv::Point(9 * shiftX, 2 * shiftY),
+			cv::Scalar(127, 127, 127), -1);
+		cv::rectangle(src, cv::Point(7.0 * shiftX-borderSize, shiftY-borderSize),
+			cv::Point(9 * shiftX+borderSize, 2 * shiftY+borderSize),
+			cv::Scalar(255, 255, 255));
+		cv::putText(src, "Exit", cv::Point(7.5 * shiftX, 1.5 * shiftY),
+			cv::FONT_HERSHEY_COMPLEX, .5, cv::Scalar(255, 255, 255));
+
+		//cv::rectangle(src, cv::Point(0, 0), cv::Point(this->width, 0.5 * shiftY), cv::Scalar(0, 0, 255), -1);
+		//if (drawCenter.x >= 0.5 * shiftX&&
+		//	drawCenter.y >= shiftY &&
+		//	drawCenter.x <= 2.5 * shiftX&&
+		//	drawCenter.y <= 2 * shiftY) {
+		//	std::cout << "1";
+
+		//	cv::rectangle(src, cv::Point(0, 0), cv::Point(counter, 0.5 * shiftY), cv::Scalar(255, 0, 0), -1);
+		//	counter++;
+		//	if (counter == this->width - 1) counter = 0;
+			//progressBar(src);
+		//}
+	//	if (this->drawCenter.x <= (int)this->width / 6 &&
+	//		this->drawCenter.y <= (int)this->height / 20)
+	//		this->color = cv::Scalar(0, 0, 255);
 		
 	}
 	void Visor::onDraw(cv::Mat &src, cv::Mat &buffer, cv::Mat &writeFile, bool mode){
@@ -150,7 +217,7 @@ namespace Visoring{
 			cv::Mat frame = cv::imread(brushPalettePath, 1);	
 			//brushSize
 			std::string s = "Brush size = " + std::to_string(brushSize);
-			int borderSize = 1;
+			
 			int padding = 40;
 			cv::putText(frame, s, cv::Point(0, 20), CV_FONT_HERSHEY_PLAIN, 0.9, cv::Scalar(255, 255, 255));
 			//+ symbol
@@ -258,13 +325,10 @@ namespace Visoring{
 				brushSize = 2;
 			}
 			fin >> color[0] >> color[1] >> color[2] >> brushSize;
-			
-			//fin >> colBuf[0] >> colBuf[1] >> colBuf[2] >> brushBuf;
-			//std::cout << colBuf << " " << brushBuf;
 			fin.close();
 		}
 		catch (cv::Exception ex) {
-
+			std::cout << ex.msg;
 		}
 	}
 

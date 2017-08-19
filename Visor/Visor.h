@@ -31,13 +31,18 @@ namespace Visoring{
 
 		cv::Mat createDrawSettings();
 		void onDrawSettings(cv::Mat&, bool isActive);
+
+		bool progressBar(cv::Mat& src);
 	
 	public:
+		int shiftX, shiftY;
+		int borderSize = 1;
 		cv::Point clickPoint = cv::Point(0,0);
 
 
 		bool drawMode = false;
 		bool clearScr = false;
+		
 		//HSV filter
 		char * filterSettingsFrameName = "HSV Filter Calibration";
 		char * filterSettingsFileName = "settings/hsvValues.txt";	
