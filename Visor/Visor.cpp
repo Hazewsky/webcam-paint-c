@@ -19,8 +19,15 @@ namespace Visoring {
 		height = this->frame.rows;
 		width = this->frame.cols;
 		this->lowerColor = getFilterData(filterSettingsFileName);
-		getBrushData(brushSettingsFileName, this->color, this->brushSize);
+		
+
+		prepare();
+	}
 #define preSet  cv::Mat::zeros(frame.size(), CV_8UC1);
+#define drawSet cv::Mat::zeros(frame.size(), CV_8UC3);
+
+	void Visor::prepare() {
+		getBrushData(brushSettingsFileName, this->color, this->brushSize);
 		this->hsv = preSet;
 		this->colorRange = preSet;
 		this->filteredFrame = preSet;
@@ -32,14 +39,12 @@ namespace Visoring {
 		this->eroded = preSet;
 		this->settings = preSet;
 		//draw
-#define drawSet cv::Mat::zeros(frame.size(), CV_8UC3);
 		this->drawing = drawSet;
 		this->buffer = drawSet;
 		this->writing = drawSet;
 		shiftX = (float)(this->width / 10);
 		shiftY = (float)(this->height / 10);
 	}
-
 	void Visor::programLoop() {
 		onDrawSettings(createDrawSettings(), brushSettingsActive);
 		cap.read(frame);
@@ -413,7 +418,6 @@ namespace Visoring {
 				std::cout << "Enter filename.\t" << std::endl;
 				std::cin >> filename;
 				correctFilename = true;
-				std::cout << filename.length();
 				for (int i = 0; i < filename.length(); i++) {
 					//std::cout << (int)filename[i] << "\t";
 					if ((int)filename[i] < 0) {

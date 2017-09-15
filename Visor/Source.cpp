@@ -18,7 +18,7 @@ int main(){
 	while (mainLoop)
 	{
 		draw.programLoop();
-		imshow("filter", draw.drawing);
+		imshow("filter", draw.getDrawing());
 		k = waitKey(10);
 		draw.keyHandler(k);
 		

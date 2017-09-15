@@ -14,14 +14,33 @@ namespace Visoring{
 		Visor();
 		~Visor();
 		void programLoop();
+		void endWork(); 
+		void keyHandler(int &key);
+		//GETTERS
+		cv::Mat getBrushSettingsFrame() { return brushSettingsFrame;};
+		cv::Mat getSettings() { return settings; };
+		cv::Mat getFrame() { return frame; };
+		cv::Mat getHsv() { return hsv; };
+		cv::Mat getColorRange() { return colorRange; };
+		cv::Mat getFilteredFrame() { return filteredFrame; };
+		cv::Mat getGrayScale() { return grayScale; };
+		cv::Mat getBlurredFrame() { return blurredFrame; };
+		cv::Mat getThresh() { return thresh; };
+		cv::Mat getEroded() { return eroded; };
+		cv::Mat getOpeningFrame() { return openingFrame; };
+		cv::Mat getDistTransform() { return distTransform; };
+		cv::Mat getNormalized() { return normalized; };
+		cv::Mat getContourred() { return contourred; };
+		cv::Mat getDrawing() { return drawing; };
+	private:
+		void prepare();
+
 		static void writeImage(cv::InputOutputArray &source, std::string name);
 		void onDraw(cv::Mat &src, cv::Mat &buffer, cv::Mat &writeFile, bool mode);
-		void keyHandler(int &key);
-		void endWork();
+		
 		void drawHUD(cv::Mat &src);
 		void onFilterSettings(char* frameName, cv::Mat& src, bool isActive);
 		
-	
 		void onTrackbar(int, void*);
 
 		void saveFilter(char* fileName);
@@ -34,8 +53,10 @@ namespace Visoring{
 		void onDrawSettings(cv::Mat&, bool isActive);
 
 		bool progressBar(cv::Mat& src);
+		
+		
+	private:
 		int timerCounter = 0;
-	public:
 		float shiftX, shiftY;
 		int borderSize = 1;
 		cv::Point clickPoint = cv::Point(0,0);
