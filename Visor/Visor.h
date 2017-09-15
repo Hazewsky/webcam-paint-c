@@ -36,7 +36,7 @@ namespace Visoring{
 		bool progressBar(cv::Mat& src);
 		int timerCounter = 0;
 	public:
-		int shiftX, shiftY;
+		float shiftX, shiftY;
 		int borderSize = 1;
 		cv::Point clickPoint = cv::Point(0,0);
 

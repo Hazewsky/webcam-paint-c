@@ -36,8 +36,8 @@ namespace Visoring {
 		this->drawing = drawSet;
 		this->buffer = drawSet;
 		this->writing = drawSet;
-		shiftX = (int)this->width / 10;
-		shiftY = (int)this->height / 10;
+		shiftX = (float)(this->width / 10);
+		shiftY = (float)(this->height / 10);
 	}
 
 	void Visor::programLoop() {
@@ -109,50 +109,48 @@ namespace Visoring {
 	void Visor::drawHUD(cv::Mat & src){
 		
 		//FILTER
-		cv::rectangle(src, cv::Point(0.5 * shiftX, shiftY),
-			cv::Point(2.5* shiftX, 2 * shiftY),
+		cv::rectangle(src, cv::Point2f(0.5f * shiftX, shiftY),
+			cv::Point2f(2.5f* shiftX, 2 * shiftY),
 			cv::Scalar(127, 127, 127), -1);
-		cv::rectangle(src, cv::Point(0.5 * shiftX- borderSize, shiftY-borderSize),
-			cv::Point(2.5* shiftX+ borderSize, 2 * shiftY+ borderSize),
+		cv::rectangle(src, cv::Point2f(0.5f * shiftX- borderSize, shiftY-borderSize),
+			cv::Point2f(2.5f* shiftX+ borderSize, 2 * shiftY+ borderSize),
 			cv::Scalar(255, 255, 255));
-		cv::putText(src, "Fllter", cv::Point(shiftX, 1.5 * shiftY),
+		cv::putText(src, "Fllter", cv::Point2d(shiftX, 1.5 * shiftY),
 			cv::FONT_HERSHEY_COMPLEX,.5,cv::Scalar(255,255,255));
 		
 		//BRUSH
-		cv::rectangle(src, cv::Point(3.0* shiftX, shiftY),
-			cv::Point(4.5* shiftX, 2 * shiftY),
+		cv::rectangle(src, cv::Point2f(3.0f* shiftX, shiftY),
+			cv::Point2f(4.5f* shiftX, 2 * shiftY),
 			cv::Scalar(127, 127, 127),-1);
-		cv::rectangle(src, cv::Point(3.0* shiftX-borderSize, shiftY-borderSize),
-			cv::Point(4.5* shiftX + borderSize, 2 * shiftY+ borderSize),
+		cv::rectangle(src, cv::Point2f(3.0f* shiftX-borderSize, shiftY-borderSize),
+			cv::Point2f(4.5f* shiftX + borderSize, 2 * shiftY+ borderSize),
 			cv::Scalar(255, 255, 255));
-		cv::putText(src, "Brush", cv::Point(3.5 * shiftX, 1.5 * shiftY), 
+		cv::putText(src, "Brush", cv::Point2d(3.5f * shiftX, 1.5f * shiftY), 
 			cv::FONT_HERSHEY_COMPLEX, .5, cv::Scalar(255, 255, 255));
 		
 		//SAVE
-		cv::rectangle(src, cv::Point(5.0 * shiftX, shiftY),
-			cv::Point(6.5 * shiftX, 2 * shiftY),
+		cv::rectangle(src, cv::Point2f(5.0f * shiftX, shiftY),
+			cv::Point2f(6.5f * shiftX, 2.0f * shiftY),
 			cv::Scalar(127, 127, 127), -1);
-		cv::rectangle(src, cv::Point(5.0 * shiftX-borderSize, shiftY-borderSize),
-			cv::Point(6.5 * shiftX+ borderSize, 2 * shiftY+ borderSize),
+		cv::rectangle(src, cv::Point2f(5.0f * shiftX-borderSize, shiftY-borderSize),
+			cv::Point2f(6.5f * shiftX+ borderSize, 2.0f * shiftY+ borderSize),
 			cv::Scalar(255, 255, 255));
-		cv::putText(src, "Save", cv::Point(5.5 * shiftX, 1.5 * shiftY),
+		cv::putText(src, "Save", cv::Point2f(5.5f * shiftX, 1.5f * shiftY),
 			cv::FONT_HERSHEY_COMPLEX, .5, cv::Scalar(255, 255, 255));
 
 		//EXIT
-		cv::rectangle(src, cv::Point(7.0 * shiftX, shiftY),
-			cv::Point(9 * shiftX, 2 * shiftY),
+		cv::rectangle(src, cv::Point2f(7.0f * shiftX, shiftY),
+			cv::Point2f(9.0f * shiftX, 2.0f * shiftY),
 			cv::Scalar(127, 127, 127), -1);
-		cv::rectangle(src, cv::Point(7.0 * shiftX-borderSize, shiftY-borderSize),
-			cv::Point(9 * shiftX+borderSize, 2 * shiftY+borderSize),
+		cv::rectangle(src, cv::Point2f(7.0f * shiftX-borderSize, shiftY-borderSize),
+			cv::Point2f(9.0f * shiftX+borderSize, 2.0f * shiftY+borderSize),
 			cv::Scalar(255, 255, 255));
-		cv::putText(src, "Exit", cv::Point(7.5 * shiftX, 1.5 * shiftY),
+		cv::putText(src, "Exit", cv::Point2f(7.5f * shiftX, 1.5f * shiftY),
 			cv::FONT_HERSHEY_COMPLEX, .5, cv::Scalar(255, 255, 255));
-		double duration;
-		//cv::rectangle(src, cv::Point(0, 0), cv::Point(this->width, 0.5 * shiftY), cv::Scalar(0, 0, 255), -1);
-		if (drawCenter.x >= 0.5 * shiftX&&
+		if (drawCenter.x >= 0.5f * shiftX&&
 			drawCenter.y >= shiftY &&
-			drawCenter.x <= 2.5 * shiftX&&
-			drawCenter.y <= 2 * shiftY && progressBar(src)) {
+			drawCenter.x <= 2.5f * shiftX&&
+			drawCenter.y <= 2.0f * shiftY && progressBar(src)) {
 			filterSettingsActive = true;
 			//std::cout << progressBar(src);
 		}
@@ -205,8 +203,20 @@ namespace Visoring {
 		
 	}
 	void Visor::keyHandler(int &key){
-
+		//Check if X is pressed
+		if (filterSettingsActive && cv::getWindowProperty(filterSettingsFrameName, 0) < 0) filterSettingsActive
+			= !filterSettingsActive;
+		if (brushSettingsActive && cv::getWindowProperty(brushSettingsFrameName, 0) < 0)
+			brushSettingsActive = !brushSettingsActive;
 		switch (key){
+		case 9:
+			//TAB
+			filterSettingsActive = !filterSettingsActive;
+			break;
+		case 49:
+			//1
+			brushSettingsActive = !brushSettingsActive;
+			break;
 		case 32:
 			this->drawMode = !this->drawMode;
 			this->clearScr = true;
@@ -276,11 +286,11 @@ namespace Visoring {
 			cv::putText(frame, "+1", cv::Point(frame.rows / 45 + frame.rows/15 - frame.rows/45 - 2*borderSize,
 				frame.cols/15 + 0.75*(frame.cols/8 - frame.cols/15)), CV_FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(255, 255, 255));
 			//- symbol
-			cv::rectangle(frame, cv::Point(frame.rows / 45, frame.cols / 15 + padding),
-				cv::Point(frame.rows / 7, frame.cols / 8 + 40), cv::Scalar(127, 127, 127), -1);
-			cv::rectangle(frame, cv::Point(frame.rows / 45 - borderSize, frame.cols / 15 + padding - borderSize),
-				cv::Point(frame.rows / 7 + borderSize, frame.cols / 8 + padding + borderSize), cv::Scalar(255, 255, 255));
-			cv::putText(frame, "-1", cv::Point(frame.rows / 45 + frame.rows / 15 - frame.rows / 45 - 2 * borderSize,
+			cv::rectangle(frame, cv::Point2d(frame.rows / 45, frame.cols / 15 + padding),
+				cv::Point2d(frame.rows / 7, frame.cols / 8 + 40), cv::Scalar(127, 127, 127), -1);
+			cv::rectangle(frame, cv::Point2d(frame.rows / 45 - borderSize, frame.cols / 15 + padding - borderSize),
+				cv::Point2d(frame.rows / 7 + borderSize, frame.cols / 8 + padding + borderSize), cv::Scalar(255, 255, 255));
+			cv::putText(frame, "-1", cv::Point2d(frame.rows / 45 + frame.rows / 15 - frame.rows / 45 - 2 * borderSize,
 				frame.cols / 15 + 0.55*(frame.cols / 8 - frame.cols / 15 + 2* padding)), CV_FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(255, 255, 255));
 
 			brushSettingsFrame = frame;
@@ -384,13 +394,40 @@ namespace Visoring {
 		this->cap.release();
 		cv::destroyAllWindows();
 		std::string filename;
-		std::cout << "Enter filename.\t Type '-' to cancel saving \t" << std::endl;
-		std::cin >> filename;
-		//scanf("%[a-zA-Z0-9 ]", filename);
-		if (filename != "-")
-		{
-			Visor::writeImage(this->writing, filename);
+		std::string choice;
+		bool checkedInput = false;
+		bool correctFilename = true;
+		std::cout << "Save? Y/N \t";
+		std::cin >> choice;
+		if (choice != "N" && choice != "n" && choice != "Y" && choice != "y") {
+			do {
+				std::cout << "Incorrect input! \t";
+				std::cin >> choice;
+			} while (choice != "N" && choice != "n" && choice != "Y" && choice != "y");
 		}
+		if (choice == "N" || choice == "n")
+			checkedInput = false;
+		if (choice == "Y" || choice == "y")
+			checkedInput = true;
+		while (checkedInput) {
+				std::cout << "Enter filename.\t" << std::endl;
+				std::cin >> filename;
+				correctFilename = true;
+				std::cout << filename.length();
+				for (int i = 0; i < filename.length(); i++) {
+					//std::cout << (int)filename[i] << "\t";
+					if ((int)filename[i] < 0) {
+						std::cout << "Spell in english please!\n";
+						correctFilename = false;
+						break;
+					}
+				}
+				if (correctFilename) {
+					Visor::writeImage(this->writing, filename);
+					checkedInput = false;
+				}
+		}
+		
 	}
 	Visor::~Visor()
 	{

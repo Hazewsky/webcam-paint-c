@@ -19,21 +19,11 @@ int main(){
 	{
 		draw.programLoop();
 		imshow("filter", draw.drawing);
-		
 		k = waitKey(10);
 		draw.keyHandler(k);
-		//Check if X is pressed
-		//Esc
-		if (draw.filterSettingsActive && getWindowProperty(draw.filterSettingsFrameName, 0) < 0) draw.filterSettingsActive 
-			= !draw.filterSettingsActive;
-		if (draw.brushSettingsActive && getWindowProperty(draw.brushSettingsFrameName, 0) < 0) 
-			draw.brushSettingsActive = !draw.brushSettingsActive;
-		if (k == 27 || getWindowProperty("filter", 0) < 0)mainLoop = !mainLoop;
 		
-		//TAB
-		if (k == 9) draw.filterSettingsActive = !draw.filterSettingsActive;
-		//1
-		if (k == 49) draw.brushSettingsActive = !draw.brushSettingsActive;
+		//Esc
+		if (k == 27 || cv::getWindowProperty("filter", 0) < 0)mainLoop = !mainLoop;
 	}
 	draw.endWork();
 	return 0;
