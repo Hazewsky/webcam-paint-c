@@ -3,6 +3,9 @@
 #include <math.h>
 #include <fstream>
 #include <string>
+#include <cstdio>
+#include <ctime>
+
 namespace Visoring {
 
 
@@ -50,14 +53,16 @@ namespace Visoring {
 	}
 
 	bool Visor::progressBar(cv::Mat& src) {
-		cv::rectangle(src, cv::Point(0, 0), cv::Point(this->width, 0.5 * shiftY), cv::Scalar(0, 0, 255), -1);
-		//for (int i = 0; i < this->width; i += (this->width / 3.0) * .001){
-		//	cv::rectangle(src, cv::Point(0, 0), cv::Point(i, 0.5 * shiftY), cv::Scalar(0, 0, 255), -1);
-		//}
-
-		for (int i = 0; i < 100; i++) {
-			cv::rectangle(src, cv::Point(0, 0), cv::Point(i, 0.5 * shiftY), cv::Scalar(i, i, i), -1);
+		//cv::rectangle(src, cv::Point(0, 0), cv::Point(this->width, 0.5 * shiftY), cv::Scalar(0, 0, 255), -1);
+		std::time_t timer = std::clock();
+		if (timerCounter == 0) timerCounter = timer;
+		
+		while (timer - timerCounter < 3000) {
+			std::time_t timer = std::clock();
+			std::cout << timerCounter << "---" << timer << "..." << timer - timerCounter << std::endl;
+			return false;
 		}
+		timerCounter = 0;
 		return true;
 	}
 	void Visor::drawHUD(cv::Mat & src){
@@ -101,14 +106,16 @@ namespace Visoring {
 			cv::Scalar(255, 255, 255));
 		cv::putText(src, "Exit", cv::Point(7.5 * shiftX, 1.5 * shiftY),
 			cv::FONT_HERSHEY_COMPLEX, .5, cv::Scalar(255, 255, 255));
-
+		double duration;
 		//cv::rectangle(src, cv::Point(0, 0), cv::Point(this->width, 0.5 * shiftY), cv::Scalar(0, 0, 255), -1);
-		//if (drawCenter.x >= 0.5 * shiftX&&
-		//	drawCenter.y >= shiftY &&
-		//	drawCenter.x <= 2.5 * shiftX&&
-		//	drawCenter.y <= 2 * shiftY) {
-		//	std::cout << "1";
-
+		if (drawCenter.x >= 0.5 * shiftX&&
+			drawCenter.y >= shiftY &&
+			drawCenter.x <= 2.5 * shiftX&&
+			drawCenter.y <= 2 * shiftY && progressBar(src)) {
+			filterSettingsActive = true;
+			//std::cout << progressBar(src);
+		}
+		
 		//	cv::rectangle(src, cv::Point(0, 0), cv::Point(counter, 0.5 * shiftY), cv::Scalar(255, 0, 0), -1);
 		//	counter++;
 		//	if (counter == this->width - 1) counter = 0;

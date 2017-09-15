@@ -7,6 +7,7 @@
 #include <iostream>
 
 namespace Visoring{
+
 	class Visor
 	{
 	public:
@@ -33,16 +34,17 @@ namespace Visoring{
 		void onDrawSettings(cv::Mat&, bool isActive);
 
 		bool progressBar(cv::Mat& src);
-	
+		int timerCounter = 0;
 	public:
 		int shiftX, shiftY;
 		int borderSize = 1;
 		cv::Point clickPoint = cv::Point(0,0);
 
+		bool filterSettingsActive = false;
+		bool brushSettingsActive = false;
 
 		bool drawMode = false;
 		bool clearScr = false;
-		
 		//HSV filter
 		char * filterSettingsFrameName = "HSV Filter Calibration";
 		char * filterSettingsFileName = "settings/hsvValues.txt";	

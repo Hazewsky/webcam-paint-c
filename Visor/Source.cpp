@@ -14,11 +14,10 @@ int main(){
 	Visor draw;
 	int k;
 	bool mainLoop = true;
-	bool settingsActive = false;
-	bool brushSettingsActive = false;
+
 	while (mainLoop)
 	{
-		draw.onDrawSettings(draw.createDrawSettings(),brushSettingsActive);
+		draw.onDrawSettings(draw.createDrawSettings(),draw.brushSettingsActive);
 		draw.cap.read(draw.frame);
 		flip(draw.frame, draw.frame, 1);
 		cvtColor(draw.frame, draw.hsv, CV_BGR2HSV);
@@ -27,7 +26,7 @@ int main(){
 		draw.filteredFrame = Mat::zeros(draw.frame.size(), CV_8UC1);
 		bitwise_and(draw.frame, draw.frame, draw.filteredFrame, draw.colorRange);
 		
-		draw.onFilterSettings(draw.filterSettingsFrameName, draw.filteredFrame, settingsActive);
+		draw.onFilterSettings(draw.filterSettingsFrameName, draw.filteredFrame, draw.filterSettingsActive);
 		GaussianBlur(draw.filteredFrame, draw.blurredFrame, Size(3, 3), 2);
 		cvtColor(draw.blurredFrame, draw.grayScale, CV_BGR2GRAY);
 		threshold(draw.grayScale, draw.thresh, 200, 255, CV_THRESH_BINARY + CV_THRESH_OTSU);
@@ -67,15 +66,16 @@ int main(){
 		draw.keyHandler(k);
 		//Check if X is pressed
 		//Esc
-		if (settingsActive && getWindowProperty(draw.filterSettingsFrameName, 0) < 0) settingsActive = !settingsActive;
-		if (brushSettingsActive && getWindowProperty(draw.brushSettingsFrameName, 0) < 0) 
-			brushSettingsActive = !brushSettingsActive;
+		if (draw.filterSettingsActive && getWindowProperty(draw.filterSettingsFrameName, 0) < 0) draw.filterSettingsActive 
+			= !draw.filterSettingsActive;
+		if (draw.brushSettingsActive && getWindowProperty(draw.brushSettingsFrameName, 0) < 0) 
+			draw.brushSettingsActive = !draw.brushSettingsActive;
 		if (k == 27 || getWindowProperty("filter", 0) < 0)mainLoop = !mainLoop;
 		
 		//TAB
-		if (k == 9) settingsActive = !settingsActive;
+		if (k == 9) draw.filterSettingsActive = !draw.filterSettingsActive;
 		//1
-		if (k == 49) brushSettingsActive = !brushSettingsActive;
+		if (k == 49) draw.brushSettingsActive = !draw.brushSettingsActive;
 	}
 	draw.endWork();
 	return 0;
