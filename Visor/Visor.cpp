@@ -41,7 +41,48 @@ namespace Visoring {
 	}
 
 	void Visor::programLoop() {
+		onDrawSettings(createDrawSettings(), brushSettingsActive);
+		cap.read(frame);
+		flip(frame, frame, 1);
+		cvtColor(frame, hsv, CV_BGR2HSV);
+		inRange(hsv, lowerColor, upperColor, colorRange);
 
+		filteredFrame = cv::Mat::zeros(frame.size(), CV_8UC1);
+		bitwise_and(frame, frame, filteredFrame, colorRange);
+
+		onFilterSettings(filterSettingsFrameName, filteredFrame, filterSettingsActive);
+		GaussianBlur(filteredFrame, blurredFrame, cv::Size(3, 3), 2);
+		cvtColor(blurredFrame, grayScale, CV_BGR2GRAY);
+		threshold(grayScale, thresh, 200, 255, CV_THRESH_BINARY + CV_THRESH_OTSU);
+		erode(thresh, eroded, kernel);
+		morphologyEx(eroded, openingFrame, cv::MORPH_OPEN, kernel, cv::Point(-1, -1), 5);
+
+		distanceTransform(openingFrame, distTransform, CV_L2, CV_DIST_MASK_PRECISE);
+		normalize(distTransform, normalized, 0.0, 1.0, cv::NORM_MINMAX);
+		cv::Mat cont;
+		cv::Mat dr = cv::Mat::zeros(frame.size(), CV_8UC3);
+		normalized.convertTo(cont, CV_8UC1);
+		//openingFrame.convertTo(cont, CV_8UC1);
+		findContours(cont, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+		
+		std::vector<cv::Moments> mu(contours.size());
+		for (size_t i = 0; i < contours.size(); i++) {
+			mu[i] = cv::moments(contours[i], false);
+		}
+		std::vector<cv::Point2f> centrs(contours.size());
+		for (size_t i = 0; i < contours.size(); i++) {
+			centrs[i] = cv::Point2f(static_cast<float>(mu[i].m10 / mu[i].m00), static_cast<float>(mu[i].m01 / mu[i].m00));
+			if (contourArea(contours[i]) > 1500 && arcLength(contours[i], false) > 100) {
+				drawCenter = centrs[i];
+			}
+		}
+		for (size_t i = 0; i < contours.size(); i++) {
+			//radius
+			drawContours(dr, contours, (int)i, CV_RGB(255, 0, 0), 3);
+			//cout << contourArea(contours[i]) << endl;
+			circle(dr, drawCenter, 3, CV_RGB(0, 0, 255), -1);
+		}
+		onDraw(drawing, buffer, writing, drawMode);
 	}
 	void Visor::writeImage(cv::InputOutputArray &source, std::string name) {
 		if (source.size() != cv::Size(0, 0))
